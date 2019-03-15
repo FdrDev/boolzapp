@@ -96,9 +96,7 @@ function enterNewMessage(e){
     //getMessage crea il div con le caratteristiche
     //del messaggio inviato chiedendo come parametro
     //il testo dell'input inserito
-    var sent = "sent"; //inizializzo uno stringa per poterla passare come parametro a getMessage
-    /*altrimenti mi resituisce un errore per via delle virgolette*/
-    var htmlMsg = getMessage(sent,txt);
+    var htmlMsg = getMessage("sent",txt);
 
     //"appendo" il messaggio con il testo dentro
     activeMessageContainer.append(htmlMsg);
@@ -167,6 +165,46 @@ console.log(meIndex);
 
 }
 
+function getMessageByHandlebars(txt) {
+
+  /*creo l'oggetto data che andrà a restituirmi le informazioni corrette
+  al posto dei {{ tag }} dell'html*/
+  var data = {
+    sentORreceived: "sent",
+    textMsg : txt,
+  }
+
+  /*creo una variabile nella quale immagazzino il contenuto html dello script*/
+  var boxTemplate = $("#box-template").html()
+  /*faccio lo stesso per compilare l'HTML preso sopra
+  non servono virgolette nel parametro*/
+  var compiled = Handlebars.compile(boxTemplate);
+  /*creo una variabile con la somma dell'HTML e le informazioni
+  contenute nell'oggetto data*/
+  var finalHTML = compiled(data);
+
+  $(".messageBox.selected").append(finalHTML);
+}
+
+function getMessageForHandlebars(e){
+
+  var me = $(this);
+
+  if(e.which == 13){
+    //immagazzino il testo dell'input
+    var txt = me.val();
+    getMessageByHandlebars(txt);
+    //resetto il campo di testo impostandolo vuoto
+    me.val(" ");
+  }
+
+}
+
+
+
+
+
+
 /*non è piu necessaria questa funzione*/
 function showInfoMessage(){
   var classSel = $(".infoMsg");
@@ -178,11 +216,13 @@ function showInfoMessage(){
 
 function init() {
 
-  /*input text*/
+  // /*input text*/
   var txt = $("#input-TXT");
-  /*questo è il trigger dell'invio del testo
-  keyup() è un trigger che funziona ogni volta che premiamo un tasto*/
-  txt.keyup(enterNewMessage);
+  // /*questo è il trigger dell'invio del testo
+  // keyup() è un trigger che funziona ogni volta che premiamo un tasto*/
+  txt.keyup(getMessageForHandlebars);
+
+
 
   //cerca dai contatti
   var searchInput = $(".search-container>input");
